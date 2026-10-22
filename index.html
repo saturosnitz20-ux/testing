@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Flower Surprise 🌸</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #26152b;
+    color: white;
+    font-family: Georgia, serif;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle, #57304f, #211127 80%);
+}
+
+#title {
+    position: absolute;
+    top: 8%;
+    width: 100%;
+    text-align: center;
+    color: #ffe1f3;
+    font-size: clamp(20px, 5vw, 30px);
+    font-weight: normal;
+    z-index: 2;
+}
+
+#photoButton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(72vw, 300px);
+    height: min(72vw, 300px);
+    padding: 0;
+    border: 4px solid #ffd5ed;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #41233d;
+    box-shadow: 0 0 35px #f4a6d977;
+    cursor: pointer;
+    z-index: 3;
+    transition: opacity .6s, scale .6s;
+}
+
+#photoButton img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#photoButton.hide {
+    opacity: 0;
+    scale: .1;
+    pointer-events: none;
+}
+
+#hint {
+    position: absolute;
+    top: 78%;
+    width: 100%;
+    text-align: center;
+    color: #ffe1f3;
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+/* Flower photos bloom outward from the center */
+
+/* Bigger flowers with space between them */
+
+/* Bigger flowers with space between them */
+.flower {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--size);
+    height: var(--size);
+    object-fit: contain;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    transform: translate(-50%, -50%) scale(.05) rotate(0deg);
+    will-change: transform, opacity;
+}
+
+.flower.bloom {
+    animation:
+        bloomOut var(--duration) cubic-bezier(.2, .7, .25, 1)
+        var(--delay) both;
+}
+
+@keyframes bloomOut {
+    0% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%)
+            translate(0, 0)
+            scale(.05)
+            rotate(0deg);
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translate(-50%, -50%)
+            translate(var(--dx), var(--dy))
+            scale(1)
+            rotate(360deg);
+    }
+}
+
+/* Outro: all flowers fall and fade away */
+.flower.fall {
+    animation: flowerFall 1.2s ease-in forwards !important;
+}
+
+@keyframes flowerFall {
+    0% {
+        opacity: 1;
+        transform:
+            translate(-50%, -50%)
+            translate(var(--finalX), var(--finalY))
+            rotate(360deg)
+            scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%)
+            translate(
+                var(--fallX),
+                calc(var(--finalY) + 100vh)
+            )
+            rotate(540deg)
+            scale(.65);
+    }
+}
+
+
+
+.flower.fade {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.6);
+    transition: opacity .8s ease, transform .8s ease;
+}
+
+/* Envelope */
+#envelopeArea {
+    position: absolute;
+    top: 52%;
+    left: 50%;
+    width: min(300px, 85vw);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -40%) scale(.7);
+    transition: opacity .9s, transform .9s, visibility .9s;
+    z-index: 10;
+}
+
+#envelopeArea.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.envelope {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    perspective: 900px;
+    filter: drop-shadow(0 12px 25px #0008);
+}
+
+.back {
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+    background: #ffe2f4;
+}
+
+.letter {
+    position: absolute;
+    bottom: 5px;
+    left: 5%;
+    width: 90%;
+    height: 165px;
+    padding: 16px;
+    border-radius: 4px;
+    background: #fffaff;
+    color: #713c65;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+    overflow: hidden;
+    transition: transform .8s, height .8s;
+    z-index: 2;
+}
+
+.letter h2 {
+    margin: 0 0 10px;
+    color: #bd4d94;
+}
+
+.front {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(140deg, #ffc2e4, #d875b4);
+    clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%);
+    z-index: 4;
+}
+
+.flap {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 105px;
+    background: #ffe9f7;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform .8s;
+    z-index: 5;
+}
+
+.heart {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    transform: translate(-50%, -50%);
+    color: #ad367c;
+    font-size: 30px;
+    z-index: 6;
+}
+
+.envelope.open .flap {
+    transform: rotateX(180deg);
+}
+
+.envelope.open .heart {
+    opacity: 0;
+}
+
+.envelope.open .letter {
+    height: 300px;
+    transform: translateY(-140px);
+    overflow-y: auto;
+}
+
+#envelopeHint {
+    margin-top: 24px;
+    text-align: center;
+    color: #ffe1f3;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+<div class="scene" id="scene">
+
+    <h1 id="title">A little surprise for you 💗</h1>
+
+    <button id="photoButton" aria-label="Tap to start">
+        <img src="myphoto.jpg" alt="Opening photo">
+    </button>
+
+    <div id="hint">✦ TAP THE PHOTO ✦</div>
+
+    <div id="envelopeArea">
+        <button class="envelope" id="envelope" aria-label="Open letter">
+            <div class="back"></div>
+
+            <div class="letter">
+                <h2>For You, 💗</h2>
+                <p>I made this little surprise just for you.</p>
+                <p>
+                    You are so special, and I hope this brings
+                    a smile to your face. May your days be filled
+                    with happiness, beautiful memories, and love. 🌸
+                </p>
+                <p>With love, always. ♡</p>
+            </div>
+
+            <div class="flap"></div>
+            <div class="front"></div>
+            <div class="heart">♥</div>
+        </button>
+
+        <div id="envelopeHint">✦ TAP TO OPEN ✦</div>
+    </div>
+</div>
+
+<script>
+const scene = document.getElementById("scene");
+const photoButton = document.getElementById("photoButton");
+const title = document.getElementById("title");
+const hint = document.getElementById("hint");
+const envelopeArea = document.getElementById("envelopeArea");
+const envelope = document.getElementById("envelope");
+const envelopeHint = document.getElementById("envelopeHint");
+
+let started = false;
+let letterOpen = false;
+
+
+
+function releaseFlowers() {
+    const photos = [
+        "flower1.jpg",
+        "flower2.jpg",
+        "flower3.jpg",
+        "flower4.jpg"
+    ];
+
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const CX = W / 2;
+    const CY = H / 2;
+
+    const flowers = [];
+    const fragment = document.createDocumentFragment();
+
+    // Extend the rings far enough to reach every screen corner.
+    const maxRadius = Math.sqrt(CX * CX + CY * CY) + 160;
+
+    // More distance between rings means fewer, more distinct flowers.
+    const ringSpacing = 85;
+    const flowerSize = 135;
+
+    function createFlower(x, y, delay, finalX, finalY) {
+        const flower = document.createElement("img");
+
+        flower.className = "flower";
+        flower.src = photos[
+            Math.floor(Math.random() * photos.length)
+        ];
+        flower.alt = "";
+        flower.draggable = false;
+
+        // Vary sizes slightly while keeping the flowers large.
+        const size = flowerSize + Math.random() * 35;
+
+        flower.style.setProperty("--size", size + "px");
+        flower.style.setProperty("--dx", x + "px");
+        flower.style.setProperty("--dy", y + "px");
+        flower.style.setProperty("--duration", "2.8s");
+        flower.style.setProperty("--delay", delay + "s");
+
+        // Store the final position for the falling outro.
+        flower.style.setProperty("--finalX", x + "px");
+        flower.style.setProperty("--finalY", y + "px");
+
+        // Each flower falls with its own sideways drift.
+        flower.style.setProperty(
+            "--fallX",
+            (x + Math.random() * 180 - 90) + "px"
+        );
+
+        fragment.appendChild(flower);
+        flowers.push(flower);
+    }
+
+    // A single flower begins the bloom at the center.
+    createFlower(0, 0, 0, 0, 0);
+
+    let ringIndex = 1;
+
+    for (
+        let radius = ringSpacing;
+        radius <= maxRadius;
+        radius += ringSpacing
+    ) {
+        // Fewer flowers on each ring, with generous spacing.
+        const count = Math.max(
+            6,
+            Math.ceil((2 * Math.PI * radius) / 90)
+        );
+
+        // Each ring blooms after the one inside it.
+        const delay = ringIndex * 0.22;
+
+        for (let i = 0; i < count; i++) {
+            const angle =
+                (2 * Math.PI * i / count) +
+                (ringIndex % 2) * (Math.PI / count);
+
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            createFlower(x, y, delay, x, y);
+        }
+
+        ringIndex++;
+    }
+
+    // Add all flowers at once.
+    scene.appendChild(fragment);
+
+    title.textContent = "Watch the flowers bloom... 🌸";
+
+    requestAnimationFrame(() => {
+        flowers.forEach(flower => {
+            flower.classList.add("bloom");
+        });
+    });
+
+    // Wait for every ring to finish expanding and spinning.
+    const bloomTime = (ringIndex - 1) * 220 + 2800;
+
+    // Hold the completed flower arrangement briefly.
+    setTimeout(() => {
+        title.textContent = "";
+
+        // Start the falling and disappearing outro.
+        flowers.forEach(flower => {
+            flower.classList.remove("bloom");
+            flower.classList.add("fall");
+        });
+
+        // Show the envelope only after all flowers fall away.
+        setTimeout(() => {
+            flowers.forEach(flower => flower.remove());
+
+            title.textContent = "A little letter for you 💌";
+            envelopeArea.classList.add("show");
+        }, 1250);
+
+    }, bloomTime + 100);
+}
+
+
+
+photoButton.addEventListener("click", () => {
+    if (started) return;
+    started = true;
+
+    photoButton.classList.add("hide");
+    hint.style.opacity = "0";
+
+    releaseFlowers();
+});
+
+envelope.addEventListener("click", () => {
+    letterOpen = !letterOpen;
+    envelope.classList.toggle("open", letterOpen);
+
+    title.textContent = letterOpen
+        ? "A message from my heart 💗"
+        : "A little letter for you 💌";
+
+    envelopeHint.textContent = letterOpen
+        ? "✦ TAP TO CLOSE ✦"
+        : "✦ TAP TO OPEN ✦";
+});
+</script>
+</body>
+</html>
